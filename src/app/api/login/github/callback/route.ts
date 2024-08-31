@@ -1,12 +1,11 @@
 import { cookies } from "next/headers";
-import { generateIdFromEntropySize } from "lucia";
 import { OAuth2RequestError } from "arctic";
-import { eq } from "drizzle-orm";
 
-import { db } from "@/db";
-import { userTable } from "@/db/schema";
-import { github, lucia } from "@/auth";
-import { GitHubUser } from "@/types";
+import { github } from "@/lib/auth";
+import { getAccountByProviderId } from "@/db/queries/account";
+import { setSession } from "@/actions/sessions";
+import { createUserAccount } from "@/actions/auth";
+import { GitHubUser, GitHubUserEmail } from "@/types";
 
 export const GET = async (request: Request): Promise<Response> => {
   const url = new URL(request.url);
@@ -25,27 +24,12 @@ export const GET = async (request: Request): Promise<Response> => {
         Authorization: `Bearer ${tokens.accessToken}`,
       },
     });
+
     const githubUser: GitHubUser = await githubUserResponse.json();
+    const existingAccount = await getAccountByProviderId(String(githubUser.id));
 
-    // TODO: Remove
-    console.info("githubUser >>>", githubUser);
-
-    // TODO: Check below Number() code
-    const existingUser = await db
-      .select()
-      .from(userTable)
-      .where(eq(userTable.github_id, Number(githubUser.id)))
-      .limit(1);
-
-    if (existingUser.length) {
-      const session = await lucia.createSession(existingUser[0].id, {});
-      const sessionCookie = lucia.createSessionCookie(session.id);
-
-      cookies().set(
-        sessionCookie.name,
-        sessionCookie.value,
-        sessionCookie.attributes
-      );
+    if (existingAccount) {
+      await setSession(existingAccount.userId);
 
       return new Response(null, {
         status: 302,
@@ -55,23 +39,23 @@ export const GET = async (request: Request): Promise<Response> => {
       });
     }
 
-    const userId = generateIdFromEntropySize(10);
+    if (!githubUser.email) {
+      const email = await getPrimaryEmail(tokens.accessToken);
+      if (!email) {
+        throw new Error("Email not found");
+      }
+      githubUser.email = email;
+    }
 
-    // TODO: Check below Number() code
-    await db.insert(userTable).values({
-      id: userId,
-      github_id: Number(githubUser.id),
-      username: githubUser.login,
+    const user = await createUserAccount({
+      email: githubUser.email,
+      name: githubUser.name,
+      image: githubUser.image,
+      provider: "github",
+      providerId: String(githubUser.id),
     });
 
-    const session = await lucia.createSession(userId, {});
-    const sessionCookie = lucia.createSessionCookie(session.id);
-
-    cookies().set(
-      sessionCookie.name,
-      sessionCookie.value,
-      sessionCookie.attributes
-    );
+    await setSession(user.id);
 
     return new Response(null, {
       status: 302,
@@ -85,4 +69,15 @@ export const GET = async (request: Request): Promise<Response> => {
     }
     return new Response(null, { status: 500 });
   }
+};
+
+export const getPrimaryEmail = async (token: string) => {
+  const response = await fetch("https://api.github.com/user/emails", {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  const emails = (await response.json()) as GitHubUserEmail[];
+  const email = emails.find((email) => email.primary)?.email;
+  return email;
 };

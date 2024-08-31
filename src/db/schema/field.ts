@@ -1,0 +1,12 @@
+import { pgTable, text, uuid } from "drizzle-orm/pg-core";
+
+import { modelTable } from "./model";
+
+export const fieldTable = pgTable("field", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  modelId: text("model_id")
+    .notNull()
+    .references(() => modelTable.id, { onDelete: "cascade" }),
+  name: text("name"), // eg. API key
+  type: text("type"), // eg. text, select, slider
+});
