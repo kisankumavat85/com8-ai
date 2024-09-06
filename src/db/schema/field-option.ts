@@ -13,5 +13,5 @@ export const fieldOption = pgTable("field_option", {
 });
 
 export const fieldOptionRelations = relations(fieldOption, ({one}) => ({
-  // TODO:
+  // TODO: Add some relations here
 }))
