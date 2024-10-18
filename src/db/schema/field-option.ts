@@ -3,7 +3,7 @@ import { pgTable, text, uuid } from "drizzle-orm/pg-core";
 import { fieldTable } from "./field";
 import { relations } from "drizzle-orm";
 
-export const fieldOption = pgTable("field_option", {
+export const fieldOptionTable = pgTable("field_option", {
   id: uuid("id").defaultRandom().primaryKey(),
   fieldId: text("field_id")
     .notNull()
@@ -12,6 +12,9 @@ export const fieldOption = pgTable("field_option", {
   value: text("value").notNull(),
 });
 
-export const fieldOptionRelations = relations(fieldOption, ({one}) => ({
-  // TODO: Add some relations here
-}))
+export const fieldOptionRelations = relations(fieldOptionTable, ({ one }) => ({
+  fieldTable: one(fieldTable, {
+    fields: [fieldOptionTable.fieldId],
+    references: [fieldTable.id],
+  }),
+}));
