@@ -1,15 +1,26 @@
 import { relations } from "drizzle-orm";
-import { pgTable, text, uuid } from "drizzle-orm/pg-core";
+import { pgEnum, pgTable, text, timestamp, uuid } from "drizzle-orm/pg-core";
 
 import { userTable } from "./user";
+
+const providers = ["github", "google"] as const;
+const providersEnum = pgEnum("provider", providers);
 
 export const accountTable = pgTable("account", {
   id: uuid("id").defaultRandom().primaryKey(),
   userId: text("user_id")
     .notNull()
     .references(() => userTable.id, { onDelete: "cascade" }),
-  provider: text("provider"),
+  provider: providersEnum("provider").notNull(),
   providerId: text("provider_id").unique(),
+
+  createdAt: timestamp("created_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+  updatedAt: timestamp("updated_at", { withTimezone: true })
+    .notNull()
+    .defaultNow()
+    .$onUpdate(() => new Date()),
 });
 
 export const accountRelations = relations(accountTable, ({ one }) => ({

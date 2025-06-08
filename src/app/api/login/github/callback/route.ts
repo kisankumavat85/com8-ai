@@ -3,7 +3,7 @@ import { OAuth2RequestError } from "arctic";
 
 import { github } from "@/lib/auth";
 import { getAccountByProviderId } from "@/db/queries/account";
-import { setSession } from "@/actions/sessions";
+import { _setSession } from "@/actions/sessions";
 import { createUserAccount } from "@/actions/auth";
 import { GitHubUser, GitHubUserEmail } from "@/types";
 
@@ -29,7 +29,7 @@ export const GET = async (request: Request): Promise<Response> => {
     const existingAccount = await getAccountByProviderId(String(githubUser.id));
 
     if (existingAccount) {
-      await setSession(existingAccount.userId);
+      await _setSession(existingAccount.userId);
 
       return new Response(null, {
         status: 302,
@@ -55,7 +55,7 @@ export const GET = async (request: Request): Promise<Response> => {
       providerId: String(githubUser.id),
     });
 
-    await setSession(user.id);
+    await _setSession(user.id);
 
     return new Response(null, {
       status: 302,

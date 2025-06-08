@@ -36,6 +36,11 @@ const SignInForm = () => {
     // ✅ This will be type-safe and validated.
     console.log(values);
   }
+
+  const onGitHubClick = async () => {
+    window.location.href = "/api/auth/github";
+  };
+
   return (
     <div className="space-y-6">
       <h2 className="text-center text-xl font-medium">Create Account</h2>
@@ -103,7 +108,11 @@ const SignInForm = () => {
         <Separator className="shrink" />
       </div>
       <div className="grid grid-cols-2 gap-2">
-        <Button variant="outline" className="flex gap-2">
+        <Button
+          variant="outline"
+          className="flex gap-2"
+          onClick={onGitHubClick}
+        >
           <GitHubLogoIcon /> GitHub
         </Button>
         <Button variant="outline" className="flex gap-2">
