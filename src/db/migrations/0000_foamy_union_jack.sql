@@ -1,6 +1,12 @@
+DO $$ BEGIN
+ CREATE TYPE "public"."provider" AS ENUM('github', 'google');
+EXCEPTION
+ WHEN duplicate_object THEN null;
+END $$;
+--> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "account" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
-	"user_id" text NOT NULL,
+	"user_id" uuid NOT NULL,
 	"provider" "provider" NOT NULL,
 	"provider_id" text,
 	"created_at" timestamp with time zone DEFAULT now() NOT NULL,
@@ -17,23 +23,23 @@ CREATE TABLE IF NOT EXISTS "chat" (
 --> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "field_option" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
-	"field_id" text NOT NULL,
+	"field_id" uuid NOT NULL,
 	"label" text NOT NULL,
 	"value" text NOT NULL
 );
 --> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "field" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
-	"model_id" text NOT NULL,
+	"model_id" uuid NOT NULL,
 	"name" text,
 	"type" text
 );
 --> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "message" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
-	"chat_id" text NOT NULL,
-	"user_id" text NOT NULL,
-	"model_id" text NOT NULL,
+	"chat_id" uuid NOT NULL,
+	"user_id" uuid NOT NULL,
+	"model_id" uuid NOT NULL,
 	"role" text NOT NULL,
 	"message" text NOT NULL,
 	"created_at" timestamp DEFAULT now()
@@ -46,23 +52,23 @@ CREATE TABLE IF NOT EXISTS "model-provider" (
 );
 --> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "model" (
-	"id" text,
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"name" text,
 	"description" text,
-	"provider" text
+	"provider" uuid
 );
 --> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "session" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
-	"user_id" text NOT NULL,
+	"user_id" uuid NOT NULL,
 	"expires_at" timestamp with time zone NOT NULL
 );
 --> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "user_model_config" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
-	"user_id" text NOT NULL,
-	"model_id" text NOT NULL,
-	"field_id" text NOT NULL,
+	"user_id" uuid NOT NULL,
+	"model_id" uuid NOT NULL,
+	"field_id" uuid NOT NULL,
 	"value" text NOT NULL
 );
 --> statement-breakpoint

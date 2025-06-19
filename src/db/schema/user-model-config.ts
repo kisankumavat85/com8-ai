@@ -8,13 +8,13 @@ import { fieldTable } from "./field";
 // To store value of dynamic value from dynamic model config form
 export const userModelConfigTable = pgTable("user_model_config", {
   id: uuid("id").defaultRandom().primaryKey(),
-  userId: text("user_id")
+  userId: uuid("user_id")
     .notNull()
     .references(() => userTable.id, { onDelete: "cascade" }),
-  modelId: text("model_id")
+  modelId: uuid("model_id")
     .notNull()
     .references(() => modelTable.id, { onDelete: "cascade" }),
-  fieldId: text("field_id")
+  fieldId: uuid("field_id")
     .notNull()
     .references(() => fieldTable.id, { onDelete: "cascade" }),
   value: text("value").notNull(),

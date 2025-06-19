@@ -3,12 +3,12 @@ import { pgEnum, pgTable, text, timestamp, uuid } from "drizzle-orm/pg-core";
 
 import { userTable } from "./user";
 
-const providers = ["github", "google"] as const;
-const providersEnum = pgEnum("provider", providers);
+export const authProviders = ["github", "google"] as const;
+export const providersEnum = pgEnum("provider", authProviders);
 
 export const accountTable = pgTable("account", {
   id: uuid("id").defaultRandom().primaryKey(),
-  userId: text("user_id")
+  userId: uuid("user_id")
     .notNull()
     .references(() => userTable.id, { onDelete: "cascade" }),
   provider: providersEnum("provider").notNull(),

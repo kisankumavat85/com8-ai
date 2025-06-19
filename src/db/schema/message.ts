@@ -5,13 +5,13 @@ import { modelTable } from "./model";
 
 export const messageTable = pgTable("message", {
   id: uuid("id").defaultRandom().primaryKey(),
-  chatId: text("chat_id")
+  chatId: uuid("chat_id")
       .notNull()
       .references(() => chatTable.id),
-  userId: text("user_id")
+  userId: uuid("user_id")
       .notNull()
       .references(() => userTable.id),
-  modelId: text("model_id")
+  modelId: uuid("model_id")
       .notNull()
       .references(() => modelTable.id),
   role: text("role").notNull(), // "user" | "assistant" | "system"

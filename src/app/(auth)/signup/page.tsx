@@ -1,5 +1,4 @@
 import SignInForm from "@/components/signin-form";
-import Image from "next/image";
 import React from "react";
 
 const SignInPage = () => {

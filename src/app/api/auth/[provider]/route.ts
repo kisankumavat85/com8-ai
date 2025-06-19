@@ -1,5 +1,5 @@
 import { env } from "@/lib/env";
-import { AuthClient } from "@/lib/oauth-client";
+import { Auth } from "@/lib/auth";
 import { cookies } from "next/headers";
 import { NextRequest } from "next/server";
 
@@ -13,7 +13,7 @@ export const GET = async (request: NextRequest, context: Context) => {
   const provider = context.params.provider;
   if (!provider) return new Response(null, { status: 400 });
 
-  const authClient = new AuthClient(provider);
+  const authClient = new Auth(provider);
   const state = authClient.generateState();
   const authURL = authClient.createAuthURL(state);
 

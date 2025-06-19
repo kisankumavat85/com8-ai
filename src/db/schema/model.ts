@@ -1,12 +1,12 @@
-import { pgTable, text } from "drizzle-orm/pg-core";
+import { pgTable, text, uuid } from "drizzle-orm/pg-core";
 import { modelProviderTable } from "./model-provider";
 import { relations } from "drizzle-orm";
 
 export const modelTable = pgTable("model", {
-  id: text("id"),
+  id: uuid("id").defaultRandom().primaryKey(),
   name: text("name"),
   description: text("description"),
-  providerId: text("provider").references(() => modelProviderTable.id, {
+  providerId: uuid("provider").references(() => modelProviderTable.id, {
     onDelete: "cascade",
   }),
 });

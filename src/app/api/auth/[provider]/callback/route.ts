@@ -1,12 +1,11 @@
 import { cookies } from "next/headers";
 import { NextRequest } from "next/server";
 
-import { AuthClientError, AuthClient } from "@/lib/oauth-client";
+import { AuthError, Auth } from "@/lib/auth";
 import { getAccountByProviderId } from "@/db/queries/account";
-import { createSession } from "@/db/queries/session";
 import { GitHubUserEmail } from "@/types";
 import { createUserAccount } from "@/actions/auth";
-import { _setSession, setSession } from "@/actions/sessions";
+import { setSession } from "@/actions/sessions";
 
 type Context = {
   params: {
@@ -18,35 +17,27 @@ export const GET = async (request: NextRequest, context: Context) => {
   const provider = context.params.provider;
   if (!provider) return new Response(null, { status: 400 });
 
-  console.log("*******1")
-  
   const url = new URL(request.url);
   const code = url.searchParams.get("code");
   const state = url.searchParams.get("state");
   const storedState = cookies().get(`${provider}-oauth-state`)?.value;
-  
-  console.log({ code, state, storedState });
-  
+
   if (!code || !state || state !== storedState) {
     return new Response(null, { status: 400 });
   }
-  
-  console.log("*******2")
+
   try {
-    const authClient = new AuthClient(provider);
+    const authClient = new Auth(provider);
     const tokenData = await authClient.getAccessToken(code);
     const user = await authClient.getUser(tokenData);
-    console.log("*******3")
     const existingAccount = await getAccountByProviderId(String(user.id));
-    console.log("*******4")
-    console.log('existingAccount---------', existingAccount)
-    if (existingAccount) {
-      await createSession(existingAccount.userId);
 
+    if (existingAccount) {
+      await setSession(existingAccount.userId);
       return new Response(null, {
         status: 302,
         headers: {
-          Location: "/",
+          Location: "/account",
         },
       });
     }
@@ -72,15 +63,15 @@ export const GET = async (request: NextRequest, context: Context) => {
     return new Response(null, {
       status: 302,
       headers: {
-        Location: "/",
+        Location: "/account",
       },
     });
   } catch (error) {
-    if (error instanceof AuthClientError) {
+    console.log('error', error)
+    if (error instanceof AuthError) {
       return new Response(null, { status: 400 });
     }
 
-    console.log('error', error)
     return new Response(null, { status: 500 });
   }
 };

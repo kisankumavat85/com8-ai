@@ -5,7 +5,7 @@ import { relations } from "drizzle-orm";
 
 export const fieldOptionTable = pgTable("field_option", {
   id: uuid("id").defaultRandom().primaryKey(),
-  fieldId: text("field_id")
+  fieldId: uuid("field_id")
     .notNull()
     .references(() => fieldTable.id, { onDelete: "cascade" }),
   label: text("label").notNull(),

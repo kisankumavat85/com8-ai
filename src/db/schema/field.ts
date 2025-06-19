@@ -5,7 +5,7 @@ import { relations } from "drizzle-orm";
 
 export const fieldTable = pgTable("field", {
   id: uuid("id").defaultRandom().primaryKey(),
-  modelId: text("model_id")
+  modelId: uuid("model_id")
     .notNull()
     .references(() => modelTable.id, { onDelete: "cascade" }),
   name: text("name"), // eg. API key

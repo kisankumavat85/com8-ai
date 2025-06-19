@@ -2,10 +2,11 @@
 
 import { createAccount } from "@/db/queries/account";
 import { createUser, getUserByEmail } from "@/db/queries/user";
+import { authProviders } from "@/db/schema/account";
 
 type CreateUserAccountParams = {
   email: string;
-  provider: string;
+  provider: (typeof authProviders)[number];
   providerId: string;
   image: string;
   name: string;
@@ -25,4 +26,3 @@ export const createUserAccount = async (data: CreateUserAccountParams) => {
 
   return existingUser;
 };
-

@@ -5,7 +5,7 @@ import { userTable } from "./user";
 
 export const sessionTable = pgTable("session", {
   id: uuid("id").defaultRandom().primaryKey(),
-  userId: text("user_id")
+  userId: uuid("user_id")
     .notNull()
     .references(() => userTable.id, { onDelete: "cascade" }),
   expiresAt: timestamp("expires_at", {
