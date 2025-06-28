@@ -1,5 +1,5 @@
 import { relations } from "drizzle-orm";
-import { pgTable, text, uuid } from "drizzle-orm/pg-core";
+import { pgTable, text, timestamp, uuid } from "drizzle-orm/pg-core";
 
 import { userTable } from "./user";
 import { modelTable } from "./model";
@@ -18,6 +18,14 @@ export const userModelConfigTable = pgTable("user_model_config", {
     .notNull()
     .references(() => fieldTable.id, { onDelete: "cascade" }),
   value: text("value").notNull(),
+
+  createdAt: timestamp("created_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+  updatedAt: timestamp("updated_at", { withTimezone: true })
+    .notNull()
+    .defaultNow()
+    .$onUpdate(() => new Date()),
 });
 
 export const userModelConfigRelations = relations(

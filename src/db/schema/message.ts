@@ -1,4 +1,4 @@
-import { pgTable, real, text, timestamp, uuid } from "drizzle-orm/pg-core";
+import { json, pgTable, text, timestamp, uuid } from "drizzle-orm/pg-core";
 import { userTable } from "./user";
 import { chatTable } from "./chat";
 import { modelTable } from "./model";
@@ -6,17 +6,26 @@ import { modelTable } from "./model";
 export const messageTable = pgTable("message", {
   id: uuid("id").defaultRandom().primaryKey(),
   chatId: uuid("chat_id")
-      .notNull()
-      .references(() => chatTable.id),
+    .notNull()
+    .references(() => chatTable.id),
   userId: uuid("user_id")
-      .notNull()
-      .references(() => userTable.id),
+    .notNull()
+    .references(() => userTable.id),
   modelId: uuid("model_id")
-      .notNull()
-      .references(() => modelTable.id),
-  role: text("role").notNull(), // "user" | "assistant" | "system"
+    .notNull()
+    .references(() => modelTable.id),
+  role: text("role").notNull(), // eg. "user" | "assistant" | "system"
+  type: text("type").notNull(), // eg. "message" TODO: What is type in OpenAI
   message: text("message").notNull(),
-  createdAt: timestamp("created_at").defaultNow(),
+  rawResponse: json("raw_response").default(null),
+
+  createdAt: timestamp("created_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+  updatedAt: timestamp("updated_at", { withTimezone: true })
+    .notNull()
+    .defaultNow()
+    .$onUpdate(() => new Date()),
 });
 
 // TODO: Store other properties later

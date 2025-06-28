@@ -1,4 +1,4 @@
-import { pgTable, text, uuid } from "drizzle-orm/pg-core";
+import { pgTable, text, timestamp, uuid } from "drizzle-orm/pg-core";
 import { modelProviderTable } from "./model-provider";
 import { relations } from "drizzle-orm";
 
@@ -9,6 +9,14 @@ export const modelTable = pgTable("model", {
   providerId: uuid("provider").references(() => modelProviderTable.id, {
     onDelete: "cascade",
   }),
+
+  createdAt: timestamp("created_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+  updatedAt: timestamp("updated_at", { withTimezone: true })
+    .notNull()
+    .defaultNow()
+    .$onUpdate(() => new Date()),
 });
 
 export const modelRelations = relations(modelTable, ({ one }) => ({

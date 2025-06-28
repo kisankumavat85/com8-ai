@@ -1,7 +1,7 @@
 import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
 
-const protectedRoutes = ["/account"];
+const protectedRoutes = ["/chat"];
 const publicRoutes = ["/", "/login"];
 
 export const middleware = async (request: NextRequest) => {
@@ -14,8 +14,8 @@ export const middleware = async (request: NextRequest) => {
     return NextResponse.redirect(new URL("/login", request.nextUrl));
   }
 
-  if (isPublicRoute && sessionId && !pathname.startsWith("/account")) {
-    return NextResponse.redirect(new URL("/account", request.nextUrl));
+  if (isPublicRoute && sessionId && !pathname.startsWith("/chat")) {
+    return NextResponse.redirect(new URL("/chat", request.nextUrl));
   }
 
   return NextResponse.next();

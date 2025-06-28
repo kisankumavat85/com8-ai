@@ -37,7 +37,7 @@ export const GET = async (request: NextRequest, context: Context) => {
       return new Response(null, {
         status: 302,
         headers: {
-          Location: "/account",
+          Location: "/chat",
         },
       });
     }
@@ -63,7 +63,7 @@ export const GET = async (request: NextRequest, context: Context) => {
     return new Response(null, {
       status: 302,
       headers: {
-        Location: "/account",
+        Location: "/chat",
       },
     });
   } catch (error) {

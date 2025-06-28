@@ -1,4 +1,4 @@
-import { pgTable, text, uuid } from "drizzle-orm/pg-core";
+import { pgTable, text, timestamp, uuid } from "drizzle-orm/pg-core";
 
 import { modelTable } from "./model";
 import { relations } from "drizzle-orm";
@@ -10,6 +10,14 @@ export const fieldTable = pgTable("field", {
     .references(() => modelTable.id, { onDelete: "cascade" }),
   name: text("name"), // eg. API key
   type: text("type"), // eg. text, select, slider
+
+  createdAt: timestamp("created_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+  updatedAt: timestamp("updated_at", { withTimezone: true })
+    .notNull()
+    .defaultNow()
+    .$onUpdate(() => new Date()),
 });
 
 export const fieldRelations = relations(fieldTable, ({ one }) => ({
