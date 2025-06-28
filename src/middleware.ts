@@ -5,7 +5,7 @@ const protectedRoutes = ["/chat"];
 const publicRoutes = ["/", "/login"];
 
 export const middleware = async (request: NextRequest) => {
-  const sessionId = cookies().get("session-id")?.value;
+  const sessionId = (await cookies()).get("session-id")?.value;
   const pathname = request.nextUrl.pathname;
   const isProtectedRoute = protectedRoutes.includes(pathname);
   const isPublicRoute = publicRoutes.includes(pathname);

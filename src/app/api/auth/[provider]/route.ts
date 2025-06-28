@@ -4,20 +4,20 @@ import { cookies } from "next/headers";
 import { NextRequest } from "next/server";
 
 type Context = {
-  params: {
+  params: Promise<{
     provider: string;
-  };
+  }>;
 };
 
 export const GET = async (request: NextRequest, context: Context) => {
-  const provider = context.params.provider;
+  const provider = (await context.params).provider;
   if (!provider) return new Response(null, { status: 400 });
 
   const authClient = new Auth(provider);
   const state = authClient.generateState();
   const authURL = authClient.createAuthURL(state);
 
-  cookies().set(`${provider}-oauth-state`, state, {
+  (await cookies()).set(`${provider}-oauth-state`, state, {
     path: "/",
     secure: env.NODE_ENV === "production",
     httpOnly: true,
