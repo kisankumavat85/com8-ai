@@ -1,8 +1,7 @@
 "use client";
 
-import { ThemeToggler } from "@/components/theme-toggler";
+import { ModeToggle } from "@/components/mode-toggle";
 import { Button } from "@/components/ui/button";
-import React from "react";
 
 const ChatPage = () => {
   const onLogoutClick = () => {
@@ -14,7 +13,9 @@ const ChatPage = () => {
       <Button variant="outline" className="flex gap-2" onClick={onLogoutClick}>
         Logout
       </Button>
-      <ThemeToggler />
+      <div className="">
+        <ModeToggle />
+      </div>
     </div>
   );
 };

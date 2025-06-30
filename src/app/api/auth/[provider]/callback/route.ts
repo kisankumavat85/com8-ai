@@ -8,19 +8,19 @@ import { createUserAccount } from "@/actions/auth";
 import { setSession } from "@/actions/sessions";
 
 type Context = {
-  params: {
+  params: Promise<{
     provider: string;
-  };
+  }>;
 };
 
 export const GET = async (request: NextRequest, context: Context) => {
-  const provider = context.params.provider;
+  const provider = (await context.params).provider;
   if (!provider) return new Response(null, { status: 400 });
 
   const url = new URL(request.url);
   const code = url.searchParams.get("code");
   const state = url.searchParams.get("state");
-  const storedState = cookies().get(`${provider}-oauth-state`)?.value;
+  const storedState = (await cookies()).get(`${provider}-oauth-state`)?.value;
 
   if (!code || !state || state !== storedState) {
     return new Response(null, { status: 400 });

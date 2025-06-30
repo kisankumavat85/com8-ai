@@ -14,7 +14,7 @@ import { redirect } from "next/navigation";
 export const setSession = async (userId: string) => {
   const sessionId = await createSession(userId);
 
-  cookies().set("session-id", sessionId || "", {
+  (await cookies()).set("session-id", sessionId || "", {
     httpOnly: true,
     maxAge: ttl,
     path: "/",
@@ -24,7 +24,7 @@ export const setSession = async (userId: string) => {
 };
 
 export const verifySession = async () => {
-  const sessionId = cookies().get("session-id")?.value;
+  const sessionId = (await cookies()).get("session-id")?.value;
   if (!sessionId) redirect("/login");
   const sessionData = await getSession(sessionId);
   if (!sessionData?.userId) redirect("/login");
@@ -33,7 +33,7 @@ export const verifySession = async () => {
 
 export const removeSession = async (sessionId: string) => {
   await deleteSession(sessionId);
-  cookies().delete("session-id");
+  (await cookies()).delete("session-id");
 };
 
 // export const _setSession = async (userId: string) => {
